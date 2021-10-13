@@ -4,8 +4,6 @@ import pafy
 import time
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 import urllib.parse as urlparse
 
 
