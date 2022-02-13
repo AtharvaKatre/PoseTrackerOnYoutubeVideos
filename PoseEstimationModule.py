@@ -7,7 +7,6 @@ import pandas as pd
 import urllib.parse as urlparse
 
 
-
 class poseDetector():
 
     def __init__(self, mode=False, complex=1, smooth_landmarks=True, segmentation=True, smooth_segmentation=True,
@@ -35,7 +34,7 @@ class poseDetector():
                 self.mpDraw.draw_landmarks(img, self.results.pose_landmarks,
                                            self.mpPose.POSE_CONNECTIONS,
                                            # self.mpDrawStyle.get_default_pose_landmarks_style())
-                                           self.mpDraw.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
+                                           self.mpDraw.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2),
                                            self.mpDraw.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2))
         return img
 
@@ -78,16 +77,21 @@ class poseDetector():
             cv2.circle(img, (x2, y2), 10, (0, 0, 255), 2)
             cv2.circle(img, (x3, y3), 5, (0, 0, 255), cv2.FILLED)
             cv2.circle(img, (x3, y3), 10, (0, 0, 255), 2)
-            cv2.putText(img, str(int(angle))+"", (x2 - 50, y2 + 50),
+            cv2.putText(img, str(int(angle)) + "", (x2 - 50, y2 + 50),
                         cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 0), 2)
         return angle
 
-    
+
 def main():
     url = input("Enter Youtube Video URL: ")
     url_data = urlparse.urlparse(url)
     query = urlparse.parse_qs(url_data.query)
-    id = query["v"][0]
+    if url_data.path == '/watch':
+        id = query["v"][0]
+    elif url_data.path[:6] == '/embed':
+        id = url_data.path[7:]
+    else:
+        id = url_data.path[1:]
     video = 'https://youtu.be/{}'.format(str(id))
     urlPafy = pafy.new(video)
     videoplay = urlPafy.getbest(preftype="any")
@@ -96,10 +100,10 @@ def main():
     start_time = int(input("Enter Start time: "))
     end_time = int(input("Enter Length: "))
     end_time = start_time + end_time
-    cap.set(cv2.CAP_PROP_POS_MSEC, start_time*milliseconds)
+    cap.set(cv2.CAP_PROP_POS_MSEC, start_time * milliseconds)
     pTime = 0
     detector = poseDetector()
-    while True and cap.get(cv2.CAP_PROP_POS_MSEC)<=end_time*milliseconds:
+    while True and cap.get(cv2.CAP_PROP_POS_MSEC) <= end_time * milliseconds:
         success, img = cap.read()
         img = detector.findPose(img)
         lmList = detector.findPosition(img, draw=False)
